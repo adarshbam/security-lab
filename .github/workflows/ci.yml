@@ -1,0 +1,60 @@
+name: Laboratory checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  check:
+    name: Chromium / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Linux local trust and hosts
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3-tools
+          mkdir -p "$HOME/.pki/nssdb"
+          certutil -N --empty-password -d "sql:$HOME/.pki/nssdb"
+          curl -L -o mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
+          echo "6d31c65b03972c6dc4a14ab429f2928300518b26503f58723e532d1b0a3bbb52  mkcert" | sha256sum -c -
+          chmod +x mkcert
+          sudo install mkcert /usr/local/bin/mkcert
+          mkcert -install
+          echo "127.0.0.1 app.security-lab.test sibling.security-lab.test attacker.csrf-lab.test" | sudo tee -a /etc/hosts
+          npx playwright install --with-deps chromium
+      - name: macOS local trust and hosts
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          brew install mkcert nss
+          mkcert -install
+          echo "127.0.0.1 app.security-lab.test sibling.security-lab.test attacker.csrf-lab.test" | sudo tee -a /etc/hosts
+      - name: Windows local trust and hosts
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          choco install mkcert --version=1.4.4 -y --no-progress
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          mkcert -install
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Add-Content -LiteralPath "$env:WINDIR/System32/drivers/etc/hosts" -Encoding ascii -Value "`n127.0.0.1 app.security-lab.test sibling.security-lab.test attacker.csrf-lab.test"
+      - run: npm run setup
+      - run: npm run check
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-evidence-${{ matrix.os }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

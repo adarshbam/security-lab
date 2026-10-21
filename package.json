@@ -1,0 +1,55 @@
+{
+  "name": "security-lab",
+  "version": "1.0.0",
+  "description": "Local educational web security laboratory exploring HttpOnly vs localStorage and SameSite CSRF protections.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "setup": "tsx scripts/setup.ts",
+    "doctor": "tsx scripts/doctor.ts",
+    "dev": "tsx watch src/server/index.ts",
+    "build": "tsc && vite build",
+    "start": "tsx scripts/start.ts",
+    "test:server": "tsx --test tests/server/*.spec.ts",
+    "test:e2e": "playwright test",
+    "test": "tsx scripts/run-tests.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "tsx scripts/check.ts",
+    "lint": "eslint .",
+    "screenshots": "tsx scripts/capture-screenshots.ts"
+  },
+  "dependencies": {
+    "cookie-parser": "1.4.7",
+    "express": "4.22.3",
+    "jsonwebtoken": "9.0.3",
+    "jsonwebtoken-2015": "npm:jsonwebtoken@4.0.0",
+    "jsonwebtoken-2022": "npm:jsonwebtoken@8.5.1",
+    "lucide-react": "0.475.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-markdown": "10.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/cookie-parser": "1.4.10",
+    "@types/express": "4.17.25",
+    "@types/jsonwebtoken": "9.0.10",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "4.7.0",
+    "eslint": "10.12.0",
+    "postcss": "8.5.29",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.2",
+    "vite": "6.4.4"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "license": "MIT"
+}
