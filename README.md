@@ -16,7 +16,7 @@ Built with **React, TypeScript, Vite, Express and Playwright**. This repository 
 Prerequisites: Node.js 24, npm, Git and [mkcert](https://github.com/FiloSottile/mkcert). Initial dependency and browser installation require internet access. Runtime experiments use local services.
 
 ```sh
-git clone <your-repository-url>
+git clone https://github.com/adarshbam/security-lab.git
 cd security-lab
 npm install
 ```

@@ -25,6 +25,10 @@ The built-runtime smoke exercised the same Express runtime with `LAB_BUILT=true`
 
 ## Limits
 
-Only Windows was executed in this workspace. The macOS/Linux GitHub Actions jobs must be run and their results reviewed after publishing the repository. No remote repository, hosted deployment or public endpoints were created.
+Only Windows was executed in this workspace. The macOS/Linux GitHub Actions jobs must be run and their results reviewed after publishing the repository. No hosted application or public experiment endpoints were created.
 
 The setup adds a development CA and local hosts entries only through explicit system steps. Leaf keys and certificates, local tooling, traces and reports remain ignored by Git. State and identities are fictional; this application must stay local.
+
+## Cookie baseline recheck — 21 October 2026
+
+`npm run check` passed again on Windows with the same Node and Chromium versions: lint, TypeScript, production build, 11 server tests and 29 browser tests. No tests were skipped or retried. The lockfile for this baseline has no JWT dependencies; unfinished historical-library experiments are kept separately until their module is ready. The offline dependency audit reported zero known advisories. The public repository is `adarshbam/security-lab`; publishing source does not expose the loopback application.
