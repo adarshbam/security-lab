@@ -46,9 +46,9 @@ Issuing credentials or merely opening a console does not unlock explanations. Co
 
 The **Request Inspector** records actual request headers, cookie names, authentication results, status codes and state transitions. Credential values are redacted. Browser-side response access errors are separate evidence: a CORS error does not prove that a mutation was prevented.
 
-**Reset Experiment** resets the active lab, revokes its credentials and clears its cookie tuples and observations. **Restart Learning Progress** clears predictions and locks explanations without changing authentication or the other lab.
+**Reset Experiment** resets the active lab, revokes its credentials and clears its cookie tuples and observations. **Restart Learning Progress** clears predictions and locks explanations without changing authentication or the other labs.
 
-## The initial labs
+## The labs
 
 ### 01 · HttpOnly Cookies vs localStorage
 
@@ -82,6 +82,22 @@ None always includes Secure. Core CSRF assertions use top-level forms. Third-par
 
 [Lab 2 instructions and challenges](src/labs/samesite-csrf/docs/README.md)
 
+### 03 · JWT Tokens: Decode, Verify & Exploit
+
+Five experiments extend [the original JWT project](https://github.com/adarshbam/exployting-jwt-tokens) inside the same prediction, request-inspector and comparison flow:
+
+- Sign in as a fictional user, edit claims and compare decode-only authorization with signature verification.
+- Reproduce RSA/HMAC algorithm confusion using the actual `jsonwebtoken` **4.0.0** package.
+- Explore unsigned-token acceptance with **8.5.1**, a missing verification key and no algorithm allowlist.
+- Compare independent readable and HttpOnly JWT cookies, including a fixed same-origin script action.
+- Measure received bearer-header bytes for small and padded tokens, with repeated requests and verification timing samples.
+
+Protected routes use **9.0.3** with a fixed algorithm, issuer, audience, expiration and lab claim checks. The workbench includes editable payloads, token copying, a downloadable ephemeral public key, user/admin positive controls and actual response history. Authentication and authorization remain separate observations. Working bearer tokens stay in component memory; learner progress contains redacted summaries.
+
+**The historical dependencies are intentionally vulnerable.** Their known advisories are part of this local reproduction. A dependency audit is not expected to be clean; do not treat the earlier cookie-only audit record as the status of this version. See [historical versions and boundaries](src/labs/exployting-jwt-tokens/docs/historical-versions.md).
+
+[Lab 3 instructions and challenges](src/labs/exployting-jwt-tokens/docs/README.md) · [Original feature mapping](src/labs/exployting-jwt-tokens/docs/source-mapping.md)
+
 <details>
 <summary>More screenshots — open after your first experiment</summary>
 
@@ -89,6 +105,9 @@ None always includes Secure. Core CSRF assertions use top-level forms. Third-par
 ![SameSite and CSRF workspace](docs/screenshots/lab2-samesite-csrf.png)
 ![Actual cross-site attacker console](docs/screenshots/attacker-console.png)
 ![Same-site sibling console](docs/screenshots/sibling-console.png)
+![JWT token workbench and observed responses](docs/screenshots/jwt-workbench.png)
+![JWT workbench in light mode on a narrow viewport](docs/screenshots/jwt-light.png)
+![JWT request-size comparison](docs/screenshots/jwt-size.png)
 
 </details>
 
@@ -130,6 +149,8 @@ Browser tests use fresh contexts, one worker and zero retries. They use trusted 
 Tests pair failed attacks with vulnerable and legitimate positive controls. For CSRF, they assert received authentication, origin/Fetch Metadata, status and before/after server state. A browser CORS error, missing text or an unchanged page alone cannot pass a defense test.
 
 Server tests cover origin/control guards, token binding, credential revocation, expiration and inspector redaction. GitHub Actions defines the same checks for Windows, macOS and Linux. Only Windows has been exercised locally; hosted matrix results must be verified after pushing the repository.
+
+JWT checks additionally distinguish successful authentication from admin authorization, compare historical verifiers with configured current verification, and exercise cookie isolation and actual request-size evidence. Recorded results are version-specific; consult the verification record for which suite has actually run.
 
 See [verification notes](docs/verification.md) and [contributor guidance](CONTRIBUTING.md).
 

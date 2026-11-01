@@ -75,12 +75,14 @@ export const App: React.FC = () => {
           onSelectExperiment={handleSelectExperiment}
         >
           {({ onExperimentActionExecuted }) => (
-            <LabComponent
-              key={currentModule.manifest.id + activeExperimentId}
-              activeExperimentId={activeExperimentId}
-              onSelectExperiment={handleSelectExperiment}
-              onExperimentActionExecuted={onExperimentActionExecuted}
-            />
+            <React.Suspense fallback={<p role="status">Loading lab…</p>}>
+              <LabComponent
+                key={currentModule.manifest.id + activeExperimentId}
+                activeExperimentId={activeExperimentId}
+                onSelectExperiment={handleSelectExperiment}
+                onExperimentActionExecuted={onExperimentActionExecuted}
+              />
+            </React.Suspense>
           )}
         </LabLayout>
       </main>

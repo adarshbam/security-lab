@@ -1,6 +1,7 @@
 import type { LabClientModule } from '../shared/contracts/lab.js';
 import { cookieStorageClientModule } from '../labs/cookie-storage/client/index.js';
 import { samesiteCsrfClientModule } from '../labs/samesite-csrf/client/index.js';
+import { jwtClientModule } from '../labs/exployting-jwt-tokens/client/index.js';
 
 class ClientLabRegistry {
   private modules: Map<string, LabClientModule> = new Map();
@@ -8,6 +9,7 @@ class ClientLabRegistry {
   constructor() {
     this.register(cookieStorageClientModule);
     this.register(samesiteCsrfClientModule);
+    this.register(jwtClientModule);
   }
 
   public register(module: LabClientModule): void {

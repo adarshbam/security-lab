@@ -1,7 +1,7 @@
 {
   "name": "security-lab",
   "version": "1.0.0",
-  "description": "Local educational web security laboratory exploring HttpOnly vs localStorage and SameSite CSRF protections.",
+  "description": "Local educational web security laboratory exploring cookie storage, SameSite CSRF protections and JWT verification.",
   "type": "module",
   "private": true,
   "scripts": {
@@ -21,6 +21,9 @@
   "dependencies": {
     "cookie-parser": "1.4.7",
     "express": "4.22.3",
+    "jsonwebtoken": "9.0.3",
+    "jsonwebtoken-2015": "npm:jsonwebtoken@4.0.0",
+    "jsonwebtoken-2022": "npm:jsonwebtoken@8.5.1",
     "lucide-react": "0.475.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -32,6 +35,7 @@
     "@tailwindcss/postcss": "4.3.3",
     "@types/cookie-parser": "1.4.10",
     "@types/express": "4.17.25",
+    "@types/jsonwebtoken": "9.0.10",
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",

@@ -1,6 +1,7 @@
 import type { LabServerModule } from '../shared/contracts/lab.js';
 import { cookieStorageServerModule } from '../labs/cookie-storage/server/index.js';
 import { samesiteCsrfServerModule } from '../labs/samesite-csrf/server/index.js';
+import { jwtServerModule } from '../labs/exployting-jwt-tokens/server/index.js';
 
 class ServerLabRegistry {
   private modules: Map<string, LabServerModule> = new Map();
@@ -27,3 +28,4 @@ class ServerLabRegistry {
 export const serverRegistry = new ServerLabRegistry();
 serverRegistry.register(cookieStorageServerModule);
 serverRegistry.register(samesiteCsrfServerModule);
+serverRegistry.register(jwtServerModule);

@@ -30,7 +30,23 @@ Browser and server registries are separate. Server-only implementations are neve
 7. Add browser tests alongside the module. The Playwright glob discovers them automatically. Establish state through real app/browser flows, pair controls and assert authoritative server state.
 8. Document challenges and primary references, run npm run check, and capture actual screenshots if the learner flow changes.
 
-Only the two initial labs are implemented. This architecture does not introduce speculative databases, plugin loaders, a general arbitrary-script runner or later vulnerability modules.
+The cookie-storage, SameSite/CSRF and JWT modules are implemented. This architecture does not introduce a database, plugin loader or general arbitrary-script runner.
+
+## JWT module boundaries
+
+The `exployting-jwt-tokens` id preserves the spelling of the source project. Its routes live at `/api/labs/exployting-jwt-tokens`. It uses the existing app HTTPS listener and needs no additional hosts, ports or servers.
+
+`server/verifiers.ts` is the only application file importing the historical npm aliases: `jsonwebtoken-2015` resolves to 4.0.0 and `jsonwebtoken-2022` resolves to 8.5.1. These are deliberately vulnerable dependencies in the same local process, not sandboxed services. They serve distinct labeled scenarios. Signing and protected verification use the separately pinned 9.0.3 package; no handwritten verifier stands in for an old library.
+
+`server/state.ts` owns fresh RSA keys, a random HMAC secret, a reset generation, fictional account projections and a bounded-lifetime credential model. Reset and logout replace the keys and generation, clear CSRF state, remove the two cookie tuples and reset counters. This revokes every JWT in this module rather than implementing per-user logout. No private signing key is returned to the browser or stored in the repository.
+
+Bearer dashboard routes consume only an explicit Authorization header. Cookie routes consume only their designated cookie and require a separate audience. The readable and HttpOnly JWTs have independent identifiers. Cookie issuance returns no raw credential in JSON. The protected preference mutation requires both exact app Origin and a CSRF value bound to the HttpOnly token identifier. The fixed script can obtain that value because it already runs on the app origin.
+
+The protected verifier checks signature, configured algorithm, issuer, audience, expiry, claim shape and reset generation. It also checks the subject against the fictional account fixtures. A subsequent profile/directory projection increments `profileReads`; admin directory access also increments `adminReads`. These counters distinguish authentication from application-data retrieval. They do not represent actual database queries, and an unchanged counter does not mean the verifier accesses no local fixtures.
+
+The token-size endpoint measures the received Authorization value, including its Bearer prefix, and one verification duration. The browser totals those values across its completed requests. Cookie transmission is omitted from bearer requests. Measurements exclude other headers, TLS, response bytes and any database work. They are evidence of request-size growth, not a general benchmark of JWTs versus server sessions.
+
+The client keeps raw working tokens in component memory, with explicit copying available to the learner. Preparation actions do not unlock explanations; actual experiment requests do. Shared progress receives only redacted evidence, while the existing inspector removes credential values from recorded headers.
 
 ## Instrumentation and learning state
 

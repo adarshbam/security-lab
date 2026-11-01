@@ -161,14 +161,16 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
           />
         )}
 
-        {progress.currentStep === 'experiment' && (
-          <StepExperiment
-            experiment={currentExperiment}
-            attempted={progress.attempted}
-            onNext={() => setStep('compare')}
-          >
-            {children({ onExperimentActionExecuted: handleExperimentActionExecuted })}
-          </StepExperiment>
+        {progress.selectedPredictionId && (
+          <div hidden={progress.currentStep !== 'experiment'}>
+            <StepExperiment
+              experiment={currentExperiment}
+              attempted={progress.attempted}
+              onNext={() => setStep('compare')}
+            >
+              {children({ onExperimentActionExecuted: handleExperimentActionExecuted })}
+            </StepExperiment>
+          </div>
         )}
 
         {progress.currentStep === 'compare' && (
