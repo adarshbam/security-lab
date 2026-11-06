@@ -1,4 +1,6 @@
-# Lab 1 — HttpOnly Cookies vs localStorage
+# Lab 3 — HttpOnly Cookies vs localStorage
+
+**Learning path · Lab 3 of 7.** Recommended preparation: Lab 1 · Broken Access Control. Lab 2 is useful practice, not a requirement. See the [full path and readiness checkpoints](../../../../docs/learning-path.md). Prerequisites guide study; they do not lock this lab.
 
 [All labs](../../../../README.md) · [Trusted setup](../../../../docs/setup.md) · [Evidence guide](../../../../docs/LEARNING-GUIDE.md)
 
@@ -6,7 +8,9 @@ Use the application at `https://app.security-lab.test:8443`. All identities and 
 
 ## Working through the lab
 
-For each experiment, read its starting conditions, record a prediction and perform the browser action before opening Compare or Learn. Login is preparation, not the experiment itself. Reissuing credentials resets Lab 1 and revokes its previous tokens.
+For each experiment, read its starting conditions, record a prediction and perform the browser action before comparing the result. You can also explore freely; explanations remain available. Login is preparation, not the experiment itself. Reissuing credentials resets this storage lab and revokes its previous tokens.
+
+Start with **View my profile** as the normal authenticated action. After the first experiment, Compare reveals the actual code and a specific retry cue; return to Experiment to repeat the browser action and check the inspector. Storage output reports readable names and whether localStorage was accessible without printing credential values. HttpOnly limits direct reads, while the fixed same-origin script can still make an authenticated request.
 
 | Experiment | Procedure | Evidence to collect |
 | --- | --- | --- |
@@ -25,7 +29,7 @@ The fixed script harness assumes same-origin JavaScript execution. It performs a
 - Why must the Secure experiment use navigation rather than an HTTP fetch from the HTTPS page?
 - Does changing a cookie Path create a JavaScript security boundary?
 - What happens when a server session expires while its cookie remains present?
-- Does resetting this lab invalidate Lab 2's cookie?
+- Does resetting this lab invalidate the CSRF lab’s cookie?
 - Optional code edit: shorten the server TTL while keeping the browser cookie unchanged, then repeat the measurement.
 
 <details>

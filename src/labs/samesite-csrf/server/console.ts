@@ -28,19 +28,25 @@ export function experimentConsole(req: Request, res: Response) {
     <h1>${escapeHtml(origin.replace('https://', ''))}</h1>
     <p>Requests below originate from <code>${escapeHtml(origin)}</code>. Compare the original request in your learner workspace.</p>
     <p>Experiment: <code>${experimentId}</code>. These identifiers correlate observations; they are not credentials.</p>
-    <section><h2>Top-level POST forms</h2><p>Forms submit in new result tabs. No CSRF token is included.</p>
+    <section><h2>Top-level POST forms</h2>
+      <p>Each button submits a real URL-encoded form POST to the named app endpoint in a new result tab. It sends a fixed dummy email and the experiment identifier, but no CSRF token. The browser supplies Origin and decides whether session_csrf is eligible under its SameSite policy. This source page cannot read the app’s HttpOnly cookie.</p>
+      <p>The server checks the session first (401 if missing), then the selected defense (403 if it fails). Vulnerable adds no CSRF defense; token requires the session-bound token; origin requires the exact app Origin; combined requires both. A 200 updates the fictional email and lastUpdatedBy. Inspect the original POST in Network and compare preferences back in the app.</p>
       <div class="forms">${forms}</div></section>
     <section><h2>Top-level GET navigation</h2>
+      <p>These links open real GET requests in new tabs. Explicit SameSite=Lax can include a session on cross-site top-level GET navigation. The read-only probe reports authentication and cookie names without changing state. The deliberately unsafe /update-get endpoint changes the dummy email if a session arrives. /update-combined always rejects GET with 405 and Allow: POST before authentication or mutation. Its rejection does not prove that a cookie was absent.</p>
       <a class="action" data-vector="probe-get" href="${target}/probe?experimentId=${experimentId}" target="_blank" rel="noopener">Navigate to read-only probe</a><br>
       <a class="action" data-vector="unsafe-get" href="${target}/update-get?email=unsafe-get@example.test&amp;experimentId=${experimentId}" target="_blank" rel="noopener">Navigate to deliberately unsafe GET</a><br>
       <a data-vector="protected-get" href="${target}/update-combined?email=unsafe-get@example.test&amp;experimentId=${experimentId}" target="_blank" rel="noopener">Compare protected GET endpoint</a></section>
-    <section><h2>Simple credentialed fetch</h2><p>Uses URL-encoded data and no custom headers. Observe whether the server receives the POST separately from whether this page can read its response.</p>
+    <section><h2>Simple credentialed fetch</h2>
+      <p>This button posts a fixed dummy email to /update-vulnerable with credentials: include, URL-encoded data and no custom headers. It is a CORS-simple request, so it does not require a preflight. Include asks the browser to send eligible cookies; it does not bypass SameSite or privacy restrictions.</p>
+      <p>The app does not grant this origin response access. A CORS error can therefore occur after the POST reached the server and changed preferences. Compare the original request, server inspector and actual state; the error text alone is not the outcome of the CSRF test.</p>
       <button id="btnFetch">Send credentialed fetch</button><pre id="fetchResult" role="status"></pre></section>
-    <section><h2>Embedded read-only request</h2><p>Privacy policies may additionally restrict third-party cookies. No mutation occurs in this probe.</p>
+    <section><h2>Embedded read-only request</h2>
+      <p>Load iframe probe inserts an iframe whose GET targets /probe. It is an embedded navigation, not a top-level link: cross-site Lax cookies are excluded here. SameSite=None may permit the cookie, but browser third-party-cookie restrictions can still prevent it. The sibling remains same-site. The endpoint only reports received cookie names and authentication; it changes no preferences. Inspect Network for the iframe request.</p>
       <button id="embed">Load iframe probe</button><div id="frame"></div></section>
     ${sibling ? `<section><h2>Cookie scope and localStorage</h2><p>Cookie names received by this hostname:</p>
       <pre id="scope-cookies">${escapeHtml(JSON.stringify(Object.keys(req.cookies)))}</pre>
-      <p>Read the same localStorage key used on the app origin:</p><pre id="scope-storage"></pre>
+      <p>This page automatically reads app_specific_secret from the sibling’s own localStorage. localStorage is scoped by origin, so the marker written on the app origin is not shared here. The cookie list above comes from this page’s incoming request, not document.cookie; a parent-domain marker can arrive here while app host-only cookies cannot. Refresh below navigates here again to update both observations.</p><pre id="scope-storage"></pre>
       <a href="/?experimentId=exp4-scope-boundaries">Refresh scope observation</a></section>` : ''}
     <script>
       const experimentId = ${JSON.stringify(experimentId)};

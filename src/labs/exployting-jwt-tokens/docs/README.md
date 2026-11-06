@@ -1,4 +1,6 @@
-# Lab 3 — JWT Tokens: Decode, Verify & Exploit
+# Lab 7 — JWT Tokens: Decode, Verify & Exploit
+
+**Learning path · Lab 7 of 7.** Recommended preparation: Labs 2, 3 and 4 · permissions, browser credentials and CSRF. See the [full path and readiness checkpoints](../../../../docs/learning-path.md). Prerequisites guide study; they do not lock this lab.
 
 [All labs](../../../../README.md) · [Trusted setup](../../../../docs/setup.md) · [Evidence guide](../../../../docs/LEARNING-GUIDE.md)
 
@@ -7,6 +9,8 @@ Run the shared [trusted HTTPS setup](../../../../docs/setup.md), then `npm run d
 This local module uses fictional accounts and real signed tokens. The account picker supplies published demo passwords: `adarsh / pass123` is a user and `rahul / admin@123` is an admin. Those credentials are teaching fixtures, not password-storage guidance. Token lifetime is adjustable from 1 to 300 seconds.
 
 Read the starting conditions, record a prediction and perform the experiment before opening Compare or Learn. Signing in, editing JSON and preparing a token do not count as an attempt. The inspector shows actual server observations; the workbench shows actual HTTP responses. Working bearer tokens are not persisted to localStorage.
+
+For the bearer attacks, first send the signed member token to **My profile** as a normal action. After an attacker request, Compare reveals the actual verifier code and a retry cue. Send the same crafted token to the protected dashboard, then restore a signed token for a permitted profile request and use a legitimate admin token for directory access. The historical libraries stay installed to reproduce their behavior; switching endpoints compares implementations and does not dynamically upgrade a package. Decode-only misuse is an application-code error that version changes alone do not correct.
 
 The working token and response history remain available when moving between Experiment, Compare and Learn. Expand Response JSON to inspect a response in full. Reloading the page or switching experiments clears the in-memory workbench; learning progress is preserved separately.
 

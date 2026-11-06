@@ -31,7 +31,7 @@ export const exp5ExpirationLifecycles: ExperimentDefinition = {
   ],
   learnMarkdown: `Browser expiry and server expiry are independent. Max-Age expires the persistent marker after five seconds; the server rejects its short-lived session after three seconds even while that HttpOnly browser cookie still exists.
 
-A session cookie has neither Max-Age nor Expires. Browser session restoration can preserve it, so closing the browser is not a reliable logout mechanism. localStorage has no built-in expiry. Logout and reset revoke all Lab 1 credentials and clear the matching cookie domain/path combinations.
+A session cookie has neither Max-Age nor Expires. Browser session restoration can preserve it, so closing the browser is not a reliable logout mechanism. localStorage has no built-in expiry. Logout and reset revoke this storage lab’s credentials and clear the matching cookie domain/path combinations.
 
 Challenge: lengthen the browser cookie lifetime without changing the server TTL. Does authentication last longer? Test it rather than assuming.`,
   codeSnippets: [],

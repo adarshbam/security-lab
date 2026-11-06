@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, HelpCircle } from 'lucide-react';
 import type { ExperimentDefinition } from '../../shared/contracts/lab.js';
+import { CookieScopeGuide } from './LessonBrief.js';
 
 interface StepUnderstandProps {
   experiment: ExperimentDefinition;
@@ -14,6 +15,9 @@ export const StepUnderstand: React.FC<StepUnderstandProps> = ({ experiment, onNe
         <h3 className="text-lg font-bold text-slate-100 mb-2">{experiment.title}</h3>
         <p className="text-sm text-slate-300 leading-relaxed mb-4">{experiment.summary}</p>
 
+        <details className="panel"><summary>Terms you’ll use</summary>{experiment.teaching?.terms.map(item => <p key={item.term}><strong>{item.term}:</strong> {item.meaning}</p>)}</details>
+        <p>{experiment.teaching?.workedExample}</p>
+        {(experiment.id.includes('storage') || experiment.id.includes('scope') || experiment.id.includes('transport') || experiment.id.includes('lifecycles') || experiment.id.includes('auth-mechanisms')) && <CookieScopeGuide />}
         {/* Starting Conditions Checklist */}
         <div className="bg-slate-950 p-4 rounded-lg border border-slate-800/80 mb-6">
           <div className="text-xs uppercase font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
@@ -37,7 +41,7 @@ export const StepUnderstand: React.FC<StepUnderstandProps> = ({ experiment, onNe
             Core Concepts & Architectural Principles
           </div>
           <div className="whitespace-pre-line text-slate-300">
-            {experiment.understandMarkdown}
+            {experiment.teaching?.objective || experiment.understandMarkdown}
           </div>
         </div>
 

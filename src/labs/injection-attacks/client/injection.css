@@ -1,0 +1,24 @@
+.injection-lab {
+  --inj-space-1: 4px; --inj-space-2: 8px; --inj-space-3: 12px; --inj-space-4: 16px; --inj-space-6: 24px;
+  --inj-control: 44px; --inj-line: 1px; --inj-radius: 8px;
+  --inj-body: 1rem; --inj-title: 1.44rem; --inj-leading: 1.6; --inj-weight: 600;
+  --inj-measure: 65ch; --inj-mono: ui-monospace, monospace; --inj-muted-opacity: .5;
+  color: var(--color-slate-100); font-size: var(--inj-body); line-height: var(--inj-leading); min-width: 0;
+}
+.injection-lab * { box-sizing: border-box; }
+.injection-lab h3 { font-size: var(--inj-title); font-weight: var(--inj-weight); }
+.injection-lab p { max-width: var(--inj-measure); margin-block: var(--inj-space-3); }
+.injection-lab .inj-section { border-top: var(--inj-line) solid var(--color-slate-800); padding-block: var(--inj-space-6); }
+.injection-lab label { display: grid; gap: var(--inj-space-2); margin-block: var(--inj-space-3); }
+.injection-lab :is(select, textarea, button) { min-height: var(--inj-control); padding: var(--inj-space-2) var(--inj-space-3); border: var(--inj-line) solid var(--color-slate-800); border-radius: var(--inj-radius); background: var(--color-slate-950); color: var(--color-slate-100); font: inherit; max-width: 100%; }
+.injection-lab :is(textarea, select) { width: 100%; }
+.injection-lab textarea { resize: vertical; font-family: var(--inj-mono); }
+.injection-lab button { cursor: pointer; font-weight: var(--inj-weight); }
+.injection-lab button:disabled { opacity: var(--inj-muted-opacity); cursor: not-allowed; }
+.injection-lab .inj-primary { background: var(--color-sky-600); color: var(--color-white); border-color: var(--color-sky-600); }
+.injection-lab .inj-actions { display: flex; flex-wrap: wrap; gap: var(--inj-space-2); margin-block: var(--inj-space-4); }
+.injection-lab pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: var(--inj-space-4); background: var(--color-slate-950); font-family: var(--inj-mono); font-variant-numeric: tabular-nums; }
+.injection-lab summary { min-height: var(--inj-control); padding-block: var(--inj-space-3); cursor: pointer; overflow-wrap: anywhere; }
+.injection-lab .inj-choice { display: flex; align-items: center; gap: var(--inj-space-3); min-height: var(--inj-control); }
+.injection-lab :is(button, textarea, select, summary, input):focus-visible { outline: var(--inj-line) solid var(--color-sky-500); outline-offset: var(--inj-space-1); }
+/* No module animation: reduced-motion users receive the same immediate content. */

@@ -1,0 +1,14 @@
+.action-explanation {
+  display: grid;
+  gap: var(--investigation-space-xs);
+  min-width: 0;
+  color: var(--color-slate-300);
+  font-size: var(--investigation-body);
+  line-height: var(--investigation-leading);
+  overflow-wrap: anywhere;
+}
+.action-explanation p { max-width: 65ch; }
+.action-explanation strong { color: var(--color-slate-100); font-weight: var(--investigation-weight); }
+.ac-section > .action-explanation { margin-bottom: var(--investigation-space-md); }
+.reset-explanation { min-height: var(--jwt-touch); cursor: pointer; }
+.reset-explanation:focus-visible { outline: var(--investigation-border); outline-color: var(--jwt-focus); outline-offset: var(--investigation-space-xs); }

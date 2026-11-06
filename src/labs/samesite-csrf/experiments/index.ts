@@ -25,3 +25,8 @@ for (const experiment of Object.values(samesiteCsrfExperiments)) {
 }
 exp5OriginValidation.codeSnippets.push(sourceRegion(originSource, 'origin-check', 'Actual exact-origin validation'));
 exp6SiblingVsAttacker.codeSnippets.push({ title: 'Actual source-site request console', language: 'typescript', code: consoleSource });
+for (const experiment of Object.values(samesiteCsrfExperiments)) {
+  experiment.defenderReplay = 'Keep the same cookie mode and source page, then retry the request against the relevant protected endpoint. Check the inspector for the Origin, received cookie, authentication result, HTTP status and unchanged preference state. Use the legitimate same-origin action on that endpoint as a positive control. A CORS response error alone does not prove the server rejected a mutation.';
+}
+exp1SameSiteModes.defenderReplay = 'Repeat the read-only probes under Strict, Lax and None. Compare which requests carry the session cookie, then try a mutation separately: SameSite behavior depends on the request context and does not replace an application CSRF check.';
+exp3CsrfTopLevelGet.defenderReplay = 'Replay the top-level GET against the protected GET endpoint. It should return 405 without changing preferences. A same-origin POST to a protected mutation endpoint remains the legitimate positive control.';

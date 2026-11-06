@@ -4,28 +4,32 @@ import { APP, SIBLING, reset, unlock, login, read, control, latest } from '../..
 const base = '/api/labs/cookie-storage';
 test.beforeEach(async ({ page }) => { await reset(page); });
 
-test('Wrong predictions allow learning only after an actual experiment; progress is per experiment', async ({ page }) => {
+test('Wrong predictions retain feedback and free exploration; progress is per experiment', async ({ page }) => {
   await page.getByRole('button', { name: 'Next: Record Your Prediction' }).click();
   await expect(page.getByRole('button', { name: 'Proceed to Experiment' })).toBeDisabled();
   await page.getByRole('radio').first().check();
   await page.getByRole('button', { name: 'Proceed to Experiment' }).click();
-  await expect(page.getByRole('button', { name: 'Compare Outcome & Hypotheses' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Compare Outcome & Hypotheses' })).toBeEnabled();
   await login(page);
-  await expect(page.getByRole('button', { name: 'Compare Outcome & Hypotheses' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Compare Outcome & Hypotheses' })).toBeEnabled();
   await expect(page.getByText('Executable Source Code Behind This Experiment')).toHaveCount(0);
   await page.getByRole('button', { name: 'Inspect JavaScript Storage' }).click();
+  await expect(page.getByRole('button', { name: 'Compare Outcome & Hypotheses' })).toBeEnabled();
+  await page.getByRole('textbox', { name: 'Your observation and reasoning' }).fill('Application lists session_httponly, but document.cookie omits it because HttpOnly blocks page JavaScript.');
   await page.getByRole('button', { name: 'Compare Outcome & Hypotheses' }).click();
-  await expect(page.getByTestId('comparison-evidence')).toContainText('localStorageCredentialAccessible');
+  await expect(page.getByTestId('comparison-evidence')).toContainText('collected');
   await expect(page.getByText('Your prediction differs from the reference expectation.')).toBeVisible();
   await page.reload();
   await expect(page.getByText('Your prediction differs from the reference expectation.')).toBeVisible();
   await page.getByRole('combobox', { name: 'Select Experiment' }).selectOption('exp2-auth-mechanisms');
   await expect(page.getByRole('button', { name: 'Next: Record Your Prediction' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Compare', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Compare', exact: true })).toBeEnabled();
 });
 
 test('Independent credentials: JS reads localStorage and readable cookie, but cannot read HttpOnly', async ({ page, context }) => {
   await unlock(page, 'exp1-storage-types'); await login(page);
+  await page.getByRole('button', { name: 'View my profile' }).click();
+  await expect(page.getByTestId('experiment-output')).toContainText('Alice Fictional');
   await page.getByRole('button', { name: 'Inspect JavaScript Storage' }).click();
   const storage = await page.evaluate(() => ({ token: localStorage.getItem('auth_token'), cookies: document.cookie }));
   const cookies = await context.cookies(APP);
@@ -38,6 +42,10 @@ test('Independent credentials: JS reads localStorage and readable cookie, but ca
   expect(storage.token).toMatch(/^bearer_[a-f0-9]{64}$/);
   expect(storage.cookies).toContain('session_readable=');
   expect(storage.cookies).not.toContain('session_httponly=');
+  const visibleOutput = await page.getByTestId('experiment-output').innerText();
+  expect(visibleOutput).toContain('localStorageCredentialAccessible');
+  expect(visibleOutput).not.toContain(storage.token!);
+  expect(visibleOutput).not.toContain(hidden.value);
   expect((await read(page, base + '/profile')).data.authMethod).toBe('cookie');
   expect((await read(page, base + '/readable-profile')).status).toBe(200);
 });
@@ -91,7 +99,7 @@ test('Secure cookies arrive on HTTPS and are omitted on HTTP with a non-Secure p
 test('Actual host, domain, path and localStorage scopes differ', async ({ page, context }) => {
   await unlock(page, 'exp4-scope-boundaries');
   await page.getByRole('button', { name: '1. Issue Scoped Cookies' }).click();
-  await expect(page.getByRole('status')).toContainText('Scoped cookies set');
+  await expect(page.getByRole('status').filter({ hasText: 'Scoped cookies set' })).toContainText('Scoped cookies set');
   await page.getByRole('button', { name: '2. Compare Path Probes' }).click();
   const data = JSON.parse(await page.getByTestId('experiment-output').innerText());
   expect(data.matchingPath.data.cookiesReceived).toContain('cookie_path_restricted');
@@ -107,7 +115,7 @@ test('Actual host, domain, path and localStorage scopes differ', async ({ page, 
 test('Browser expiration and server TTL are independent; localStorage does not expire', async ({ page, context }) => {
   await unlock(page, 'exp5-expiration-lifecycles'); await login(page);
   await page.getByRole('button', { name: 'Set Lifecycle Cookies' }).click();
-  await expect(page.getByRole('status')).toContainText('Max-Age=5s');
+  await expect(page.getByRole('status').filter({ hasText: 'Max-Age=5s' })).toContainText('Max-Age=5s');
   const cookies = await context.cookies(APP);
   expect(cookies.find(c => c.name === 'cookie_session_lifecycle')!.expires).toBe(-1);
   expect(cookies.find(c => c.name === 'cookie_persistent_5s')!.expires).toBeGreaterThan(Date.now() / 1000);
@@ -125,12 +133,12 @@ test('Reconfiguration revokes previous credentials held by another real browser 
   await unlock(page, 'exp1-storage-types'); await login(page);
   const oldBearer = await page.evaluate(() => localStorage.getItem('auth_token'));
   const other = await browser.newContext(); const otherPage = await other.newPage();
-  await otherPage.goto(APP); await unlock(otherPage, 'exp1-storage-types'); await login(otherPage);
+  await otherPage.goto(APP + "/?lab=cookie-storage"); await unlock(otherPage, 'exp1-storage-types'); await login(otherPage);
   expect((await read(page, base + '/profile')).status).toBe(401);
   expect((await read(page, base + '/bearer-profile', { headers: { Authorization: 'Bearer ' + oldBearer } })).status).toBe(401);
   expect((await read(otherPage, base + '/profile')).status).toBe(200);
   await otherPage.getByRole('button', { name: 'Logout / Revoke Session' }).click();
-  await expect(otherPage.getByRole('status')).toContainText('Logged out!');
+  await expect(otherPage.getByRole('status').filter({ hasText: 'Logged out!' })).toContainText('Logged out!');
   expect((await read(otherPage, base + '/profile')).status).toBe(401);
   await other.close();
 });
@@ -141,6 +149,7 @@ test('Reset clears all cookie tuples and only its lab; learning reset is separat
   await control(page, base + '/cookies/lifecycles');
   await control(page, '/api/labs/samesite-csrf/configure-cookie', { mode: 'none' });
   await page.getByRole('button', { name: 'Inspect JavaScript Storage' }).click();
+  await page.getByRole('textbox', { name: 'Your observation and reasoning' }).fill('The cookie names in Application differ from document.cookie because of HttpOnly.');
   await page.getByRole('button', { name: 'Reset Experiment', exact: true }).click();
   await expect(page.getByText('No active session', { exact: true })).toBeVisible();
   const cookies = await context.cookies();

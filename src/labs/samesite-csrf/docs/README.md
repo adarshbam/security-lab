@@ -1,10 +1,14 @@
-# Lab 2 — SameSite & CSRF
+# Lab 4 — SameSite & CSRF
+
+**Learning path · Lab 4 of 7.** Recommended preparation: Lab 3 · HttpOnly Cookies vs localStorage. See the [full path and readiness checkpoints](../../../../docs/learning-path.md). Prerequisites guide study; they do not lock this lab.
 
 [All labs](../../../../README.md) · [Trusted setup](../../../../docs/setup.md) · [Evidence guide](../../../../docs/LEARNING-GUIDE.md)
 
 The legitimate app is `https://app.security-lab.test:8443`. Its sibling is `https://sibling.security-lab.test:8443`; the cross-site attacker is `https://attacker.csrf-lab.test:8443`.
 
 Select an experiment, record a prediction and configure a cookie. Open the appropriate source console from the learner page. Submit the source page's forms, links, fetch or embedded probe. Result tabs preserve your learner workspace; return to inspect original request headers and profile state.
+
+The fictional user's ordinary action is a same-origin preference update. After the first attacker request, Compare reveals the actual endpoint code and a retry cue. Use **Reset Lab Preferences** to restore comparable state without replacing the session, retry from the same source against the relevant protected endpoint, and finish with the legitimate same-origin control. Check authentication and before/after state in the inspector; a CORS error on the source page is not a server denial.
 
 ## Experiments
 

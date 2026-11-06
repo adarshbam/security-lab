@@ -12,7 +12,7 @@ async function openJwt(page: Page, experiment: string) {
 async function issue(page: Page, account = 'adarsh') {
   await page.getByRole('combobox', { name: 'Demo account', exact: true }).selectOption(account);
   await page.getByRole('button', { name: 'Sign in / Issue JWT', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText(`token issued for ${account}`);
+  await expect(page.getByRole('status').filter({ hasText: `token issued for ${account}` })).toContainText(`token issued for ${account}`);
   return page.getByRole('textbox', { name: 'Working JWT', exact: true }).inputValue();
 }
 
@@ -50,31 +50,34 @@ test('JWT prediction gate records a real response, not login or token preparatio
   await page.getByRole('radio').first().check();
   await page.getByRole('button', { name: 'Proceed to Experiment' }).click();
   const compare = page.getByRole('button', { name: 'Compare Outcome & Hypotheses' });
-  await expect(compare).toBeDisabled();
+  await expect(compare).toBeEnabled();
   await page.getByRole('textbox', { name: 'Demo password', exact: true }).fill('wrong-fictional-password');
   await page.getByRole('button', { name: 'Sign in / Issue JWT' }).click();
   await expect(page.getByRole('alert')).toContainText('published fictional lab account');
-  await expect(compare).toBeDisabled();
+  await expect(compare).toBeEnabled();
   await page.getByRole('textbox', { name: 'Demo password', exact: true }).fill('pass123');
   await issue(page);
   await editPayload(page, { role: 'admin' });
   await page.getByRole('button', { name: 'Apply payload / keep signature', exact: true }).click();
-  await expect(compare).toBeDisabled();
+  await expect(compare).toBeEnabled();
   await expect(page.getByText('Executable implementation', { exact: true })).toHaveCount(0);
   expect((await send(page, 'decode', 'protected')).status).toBe(401);
   const workingToken = await page.getByRole('textbox', { name: 'Working JWT', exact: true }).inputValue();
+  await expect(compare).toBeEnabled();
+  await page.getByRole('textbox', { name: 'Your observation and reasoning' }).fill('Network returned 401 for the edited token at the protected route because its signature no longer matches.');
   await compare.click();
-  await expect(page.getByTestId('comparison-evidence')).toContainText('401');
+  await expect(page.getByRole('table').first()).toContainText('401');
   await expect(page.getByText('Your prediction differs from the reference expectation.')).toBeVisible();
-  await page.getByRole('button', { name: 'Experiment', exact: true }).click();
+  await expect(page.getByTestId('defender-replay')).toContainText('decode-only reads JSON');
+  await page.getByRole('button', { name: 'Return to experiment and retry' }).click();
   await expect(page.getByRole('textbox', { name: 'Working JWT', exact: true })).toHaveValue(workingToken);
   await expect(page.getByTestId('jwt-response').first()).toContainText('401');
   await compare.click();
   await page.reload();
-  await expect(page.getByTestId('comparison-evidence')).toContainText('401');
+  await expect(page.getByRole('table').first()).toContainText('401');
   await page.getByRole('combobox', { name: 'Select Experiment' }).selectOption('jwt-confusion');
   await expect(page.getByRole('button', { name: 'Next: Record Your Prediction' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Compare', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Compare', exact: true })).toBeEnabled();
 });
 
 test('Decode misuse accepts a browser-edited role; verified controls separate authentication and authorization', async ({ page }) => {
@@ -191,7 +194,7 @@ test('Real JWT cookies hide the independent HttpOnly value; same-origin action s
   const issuancePromise = page.waitForResponse(response => new URL(response.url()).pathname === base + '/cookies/login');
   await page.getByRole('button', { name: 'Issue JWT cookies', exact: true }).click();
   const issuance = await (await issuancePromise).json();
-  await expect(page.getByRole('button', { name: 'Compare Outcome & Hypotheses' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Compare Outcome & Hypotheses' })).toBeEnabled();
   const cookies = await context.cookies(APP);
   const readable = cookies.find(cookie => cookie.name === 'jwt_lab_readable')!;
   const hidden = cookies.find(cookie => cookie.name === 'jwt_lab_httponly')!;
@@ -210,6 +213,7 @@ test('Real JWT cookies hide the independent HttpOnly value; same-origin action s
   expect(JSON.stringify(issuance)).not.toContain(readable.value);
   await page.getByRole('button', { name: 'Inspect JWT cookies & authentication', exact: true }).click();
   await expect(page.getByTestId('jwt-storage-evidence')).toBeVisible();
+  await page.getByRole('textbox', { name: 'Your observation and reasoning' }).fill('Application shows the HttpOnly JWT, while document.cookie omits its name.');
   const evidence = JSON.parse(await page.getByTestId('jwt-storage-evidence').innerText());
   expect(evidence.readableCredentialAccessible).toBe(true);
   expect(evidence.visibleJwtCookieNames).toEqual(['jwt_lab_readable']);
@@ -236,7 +240,7 @@ test('Real JWT cookies hide the independent HttpOnly value; same-origin action s
 test('Cookie and bearer routes cannot silently authenticate each other', async ({ page }) => {
   await openJwt(page, 'jwt-storage');
   await page.getByRole('button', { name: 'Issue JWT cookies', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('JWT cookies issued');
+  await expect(page.getByRole('status').filter({ hasText: 'JWT cookies issued' })).toContainText('JWT cookies issued');
   expect((await read(page, base + '/cookies/profile/httponly')).status).toBe(200);
   expect((await read(page, base + '/decode/dashboard/protected?view=profile')).status).toBe(401);
   const issued = await control(page, base + '/login', { username: 'adarsh', password: 'pass123', scenario: 'decode' });
@@ -258,6 +262,7 @@ test('JWT reset revokes old credentials and clears only JWT cookies while preser
   await page.getByRole('button', { name: 'Issue JWT cookies', exact: true }).click();
   await page.getByRole('button', { name: 'Inspect JWT cookies & authentication', exact: true }).click();
   await expect(page.getByTestId('jwt-storage-evidence')).toBeVisible();
+  await page.getByRole('textbox', { name: 'Your observation and reasoning' }).fill('The HttpOnly JWT authenticates the cookie route but is absent from document.cookie.');
   const issued = await control(page, base + '/login', { username: 'adarsh', password: 'pass123', scenario: 'decode' });
   const oldPem = await page.evaluate(async path => (await fetch(path)).text(), base + '/public-key');
   const reloaded = page.waitForEvent('load');
@@ -291,7 +296,7 @@ test('Logout revokes a token held in another genuine browser context', async ({ 
     await issue(other, 'rahul');
     expect((await send(page, 'confusion', 'protected', 'profile')).status).toBe(200);
     await other.getByRole('button', { name: 'Logout / Revoke JWTs', exact: true }).click();
-    await expect(other.getByRole('status')).toContainText('Logged out.');
+    await expect(other.getByRole('status').filter({ hasText: 'Logged out.' })).toContainText('Logged out.');
     for (const variant of ['vulnerable', 'protected'] as const) {
       expect((await read(page, `${base}/confusion/dashboard/${variant}?view=profile`, {
         omit: true, headers: { Authorization: 'Bearer ' + original },

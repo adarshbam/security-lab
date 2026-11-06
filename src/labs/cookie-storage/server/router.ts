@@ -105,10 +105,10 @@ cookieStorageRouter.post('/cookies/lifecycles', adminGuard, (_req, res) => {
 cookieStorageRouter.post('/logout', adminGuard, (_req, res) => {
   labState.reset();
   clearCookies(res);
-  res.json({ success: true, message: 'Logged out! All Lab 1 credentials revoked and cookies cleared.' });
+  res.json({ success: true, message: 'Logged out! All storage lab credentials revoked and cookies cleared.' });
 });
 cookieStorageRouter.post('/reset', adminGuard, (_req, res) => {
   labState.reset();
   clearCookies(res);
-  res.json({ success: true, message: 'Lab 1 reset; other labs are unchanged.' });
+  res.json({ success: true, message: 'Storage lab reset; other labs are unchanged.' });
 });

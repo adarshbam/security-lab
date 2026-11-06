@@ -36,5 +36,6 @@ export interface ExperimentObservation {
   stateBefore: Record<string, any>;
   stateAfter: Record<string, any>;
   status: number;
+  requestBody?: Record<string, unknown>;
   clientReportedError?: string;
 }

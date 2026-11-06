@@ -1,20 +1,21 @@
 import { useCallback, useState } from 'react';
 import type { ExperimentStep, ExperimentProgress } from '../../shared/contracts/progress.js';
 
-const STORAGE_KEY = 'security_lab_learner_progress_v1';
+const STORAGE_KEY = 'security_lab_learner_progress_v2';
 type ProgressStore = Record<string, Record<string, ExperimentProgress>>;
 const initialProgress: ExperimentProgress = {
   currentStep: 'understand', selectedPredictionId: null, attempted: false, unlockedLearn: false,
 };
 function readStore(): ProgressStore {
   try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || localStorage.getItem('security_lab_learner_progress_v1') || '{}');
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   } catch { return {}; }
 }
 export function useLearnerProgress(labId: string, experimentId: string) {
   const [store, setStore] = useState<ProgressStore>(readStore);
-  const progress = { ...initialProgress, ...store[labId]?.[experimentId] };
+  const saved = { ...initialProgress, ...store[labId]?.[experimentId] };
+  const progress = saved;
   const update = useCallback((changes: Partial<ExperimentProgress>) => {
     setStore(previous => {
       const next = { ...previous, [labId]: { ...previous[labId], [experimentId]: {
@@ -26,6 +27,7 @@ export function useLearnerProgress(labId: string, experimentId: string) {
   }, [labId, experimentId]);
   const setStep = (currentStep: ExperimentStep) => update({ currentStep });
   const setPrediction = (selectedPredictionId: string) => update({ selectedPredictionId });
-  const recordAttempt = useCallback((evidence?: Record<string, unknown>) => update({ attempted: true, unlockedLearn: true, evidence }), [update]);
-  return { progress, setStep, setPrediction, recordAttempt };
+  const setInvestigationNotes = (investigationNotes: string) => update({ investigationNotes });
+  const recordAttempt = useCallback((evidence?: Record<string, unknown>) => update({ attempted: true, unlockedLearn: true, evidence: evidence ? { collected: true } : undefined }), [update]);
+  return { update, progress, setStep, setPrediction, setInvestigationNotes, recordAttempt };
 }

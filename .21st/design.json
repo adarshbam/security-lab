@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "project": {
+    "name": "security-lab",
+    "productType": "Local educational web security laboratory",
+    "stack": [
+      "react",
+      "tailwind-v4",
+      "vite"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/client/styles/index.css",
+      "src/client/components/learning-path.css"
+    ],
+    "components": [
+      "src/client/components/Header.tsx",
+      "src/client/components/LabLayout.tsx",
+      "src/client/components/LearningPath.tsx"
+    ],
+    "assets": [],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "light-and-dark",
+    "colors": {
+      "background": "--color-slate-950",
+      "surface": "--color-slate-900",
+      "text": "--color-slate-100",
+      "muted": "--color-slate-400",
+      "hairline": "--color-slate-800",
+      "accent": "--color-sky-700"
+    },
+    "typography": {
+      "body": "system-ui; 1rem; line-height 1.6",
+      "curriculum-scale": "1.25 ratio; fluid display 1.5625\u20131.953125rem"
+    },
+    "spacing": {
+      "curriculum": "4, 8, 16, 24, 32, 48px"
+    },
+    "radius": {
+      "small": "--jwt-radius (8px)"
+    },
+    "shadows": {
+      "curriculum": "none"
+    },
+    "motion": {
+      "curriculum": "static; global prefers-reduced-motion override"
+    },
+    "density": "reading-focused"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [
+      "semantic details/summary",
+      "ordered list",
+      "existing focus-visible styles",
+      "existing reading palette"
+    ],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [
+      "Use existing light/dark tokens",
+      "Show real labs and advisory prerequisites",
+      "Retain stable lab IDs and saved progress",
+      "44px touch targets; visible keyboard focus"
+    ],
+    "avoid": [
+      "Decorative motion",
+      "Completion or mastery claims from navigation",
+      "New dependencies for curriculum navigation"
+    ]
+  },
+  "decisions": [],
+  "evidence": [
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:tailwind-v4",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:vite",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-11-02T17:19:15.452Z"
+}

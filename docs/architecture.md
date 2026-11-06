@@ -35,7 +35,13 @@ State is in memory and intentionally models one local learner at a time. Reconfi
 - **LabServerModule:** app router, optional sibling/attacker routers, initial state, state accessor and reset.
 - **ExperimentObservation:** captured headers, cookie names, authentication, protection result, status and state snapshots.
 
-Browser and server registries are separate. Server-only implementations are never imported as executable browser modules. Explicit `?raw` imports provide source text for snippets after an attempt.
+Browser and server registries are separate. Server-only implementations are never imported as executable browser modules. Explicit `?raw` imports provide source text for comparison snippets.
+
+## Teaching convention
+
+Use the existing Understand → Predict → Experiment → Compare → Learn steps. Introduce an ordinary fictional application and a permitted action before asking the learner to cross a specific boundary. Encourage a prediction before the first experiment request while retaining free exploration and access to explanations. Compare identifies the exact missing or enforced check and gives a concrete retry using the same attacker request against comparable protected state or a corrected implementation. Verify a legitimate action still works, and use the inspector plus a fresh state read to distinguish authentication, authorization and mutation. Let the learner return to Experiment to retry, then reset the module independently. Workbenches mount on the first visit to Experiment and remain mounted when that experiment’s other guided stages are viewed; browsing introductions does not issue workbench requests.
+
+The controls should fit the mechanism. The access labs select separate vulnerable and protected worlds with matching fictional fixtures; selecting a world runs a different implementation and is not live source editing. CSRF uses real attacker and sibling origins. Cookie labs retain browser storage and transport behavior, including the limit that HttpOnly cannot stop an already-running same-origin script. JWT historical-version experiments keep the old library installed for reproduction and compare the same crafted token with the existing modern verifier; the decode-only flaw requires application-code correction. A size measurement needs no invented attack or defense toggle. Never infer success from a badge, CORS error or unchanged screen without the request and state evidence.
 
 ## Add one module
 
@@ -43,12 +49,12 @@ Browser and server registries are separate. Server-only implementations are neve
 2. Export a LabClientModule and a LabServerModule. Register them in the corresponding client/server registries. Use a unique id, cookie names and storage keys.
 3. Mount experiment routes relative to the module router. Protect configuration, reset and observation controls with adminGuard; keep explicitly vulnerable and corrected routes independently executable.
 4. If the lab needs source-origin pages, provide its own `hostRouters.sibling` or `hostRouters.attacker` Express router. Link to `https://<source-host>:8443/labs/<id>/` or pass `labId=<id>` at the source root. Existing modules do not change.
-5. Give each experiment starting conditions, predictions, instructions, learning material and executable source snippets. Use marked source regions and sourceRegion; do not maintain an illustrative duplicate of implementation code.
+5. Give each experiment starting conditions, predictions, instructions, learning material, a tailored defender retry cue and executable source snippets. Use marked source regions and sourceRegion; do not maintain an illustrative duplicate of implementation code.
 6. Implement lab-local reset to revoke credentials, restore dummy state and clear exact cookie domain/path tuples. Coordinate removal of browser localStorage keys in the module's client.
 7. Add browser tests alongside the module. The Playwright glob discovers them automatically. Establish state through real app/browser flows, pair controls and assert authoritative server state.
 8. Document challenges and primary references, run npm run check, and capture actual screenshots if the learner flow changes.
 
-The cookie-storage, SameSite/CSRF and JWT modules are implemented. This architecture does not introduce a database, plugin loader or general arbitrary-script runner.
+All seven curriculum modules are implemented. `src/shared/curriculum.ts` defines their display order, difficulty, knowledge prerequisites, conceptual links and readiness checkpoints. Both registries sort by this shared order; stable IDs, deep links and saved progress are unchanged. Add a curriculum entry when registering a new lab. The learning path is advisory and does not couple runtime state or lock any lab. This architecture does not introduce a database, plugin loader or general arbitrary-script runner.
 
 ## JWT module boundaries
 
@@ -64,7 +70,7 @@ The protected verifier checks signature, configured algorithm, issuer, audience,
 
 The token-size endpoint measures the received Authorization value, including its Bearer prefix, and one verification duration. The browser totals those values across its completed requests. Cookie transmission is omitted from bearer requests. Measurements exclude other headers, TLS, response bytes and any database work. They are evidence of request-size growth, not a general benchmark of JWTs versus server sessions.
 
-The client keeps raw working tokens in component memory, with explicit copying available to the learner. Preparation actions do not unlock explanations; actual experiment requests do. Shared progress receives only redacted evidence, while the existing inspector removes credential values from recorded headers.
+The client keeps raw working tokens in component memory, with explicit copying available to the learner. Preparation and experiment actions are distinct; explanations remain available for exploration. Shared progress receives only redacted evidence, while the existing inspector removes credential values from recorded headers.
 
 ## Instrumentation and learning state
 
@@ -72,4 +78,4 @@ The inspector captures path/URL before Express subrouter mounting, then records 
 
 Experiment identifiers correlate observations and never authenticate a request. Correlation is instrumentation for a trusted local learner, not a security boundary. Server logs cannot expose HttpOnly tokens or make a cross-origin response readable.
 
-Learner predictions and per-experiment progress live in a separate localStorage key. Direct storage evidence is persisted only as a redacted summary. The Compare view separates reference expectations from actual observations. This UI gating does not hide the public source repository.
+Learner predictions and per-experiment progress live in a separate localStorage key. Direct storage evidence is persisted only as a redacted summary. The Compare view separates reference expectations from actual observations. Practice records are not verified mastery, and the source repository remains public.

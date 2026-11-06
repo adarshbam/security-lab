@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-02",
+  "runtime": "Windows, Node 24.11.1, trusted local HTTPS, production build",
+  "lighthouseVersion": "13.6.0",
+  "url": "https://app.security-lab.test:8443/",
+  "accessibilityScope": [
+    "header",
+    ".learning-path",
+    ".learning-path-navigation"
+  ],
+  "responsiveChecks": [
+    {
+      "theme": "light",
+      "width": 375,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "noOverflow": true,
+      "violations": []
+    }
+  ],
+  "introductionErrors": [],
+  "lighthouse": [
+    {
+      "device": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "lcp": 285.386,
+      "cls": 0,
+      "tbt": 57
+    },
+    {
+      "device": "mobile",
+      "performance": 87,
+      "accessibility": 100,
+      "lcp": 1057.3484,
+      "cls": 0,
+      "tbt": 502.32579999999984
+    }
+  ],
+  "tests": {
+    "server": 20,
+    "affectedChromium": 14,
+    "entireHistoricalBrowserSuiteRerun": false
+  },
+  "limitations": [
+    "Mobile Performance 87 is below the requested 90 target.",
+    "No field INP measurement; TBT is not INP.",
+    "Lighthouse measured the fresh introduction view, not every saved stage or lab workbench.",
+    "No human screen-reader study was performed."
+  ]
+}

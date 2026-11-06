@@ -27,7 +27,21 @@ export interface CodeSnippetItem {
   explanation?: string;
 }
 
+export interface TeachingContent {
+  check?: { prompt: string; options: PredictionOption[] };
+  objective: string;
+  prerequisites: string[];
+  terms: { term: string; meaning: string }[];
+  workedExample: string;
+  steps: { id: string; action: string; evidence: string; hint: string }[];
+  console?: string;
+  question: string;
+  challenge: string;
+  review: string;
+}
+
 export interface ExperimentDefinition {
+  teaching?: TeachingContent;
   id: string;
   title: string;
   summary: string;
@@ -37,6 +51,7 @@ export interface ExperimentDefinition {
   predictionOptions: PredictionOption[];
   learnMarkdown: string;
   codeSnippets: CodeSnippetItem[];
+  defenderReplay?: string;
 }
 
 export interface LabManifest {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Activity, Trash2, RefreshCw, ChevronDown, ChevronRight, Shield, ShieldAlert, ArrowRight } from 'lucide-react';
 import type { ExperimentObservation } from '../../shared/contracts/inspector.js';
+import { ActionExplanation } from './ActionExplanation.js';
 
 interface RequestInspectorProps {
   observations: ExperimentObservation[];
@@ -23,6 +24,14 @@ export const RequestInspector: React.FC<RequestInspectorProps> = ({
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden mt-8">
+      <div className="p-4">
+        <ActionExplanation title="How to read this evidence">
+          <p>This is a redacted server-side record, filtered to the selected experiment. Use browser Network to inspect the original request headers, body and response, and Application to inspect stored credentials. A stored cookie is not proof it was sent, and a received cookie is not proof that the endpoint accepted it.</p>
+          <p>Expand a row to see the headers received, any recorded authentication decision and before/after snapshots. Some setup, helper or page-load requests are logged without the active experiment identifier and will not appear in this filtered list. An endpoint that does not record authentication or snapshots leaves default or empty fields; those are not evidence that authentication failed or that no state changed.</p>
+          <p>Refresh reads the saved observations; it does not repeat your experiment. Clear deletes observations for this experiment without undoing requests, revoking credentials, resetting fictional state or clearing browser Network history. Experiment identifiers correlate evidence; they are not authentication credentials.</p>
+          <p>Lab setup, reset and inspector calls use a local control helper that posts JSON with X-Security-Lab-Admin: true. The server also requires the exact app Origin. This header enables the teaching controls; it does not make the fictional user an admin. Inspector polling can add these helper requests to Network automatically. Fictional application state lives in this server process’s memory, so a server restart or another tab’s reset can affect your experiment.</p>
+        </ActionExplanation>
+      </div>
       {/* Inspector Header */}
       <div className="p-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
@@ -171,6 +180,7 @@ export const RequestInspector: React.FC<RequestInspectorProps> = ({
                     </div>
 
                     {/* Decision & State Diff */}
+                    {obs.requestBody && <div className="text-slate-300"><span className="text-slate-500">Supplied JSON: </span><pre className="result">{JSON.stringify(obs.requestBody, null, 2)}</pre></div>}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Security Decision */}
                       <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800 space-y-1.5">

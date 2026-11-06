@@ -1,0 +1,23 @@
+.xss-lab {
+  --xss-s1: 4px; --xss-s2: 8px; --xss-s4: 16px; --xss-s6: 24px; --xss-s8: 32px;
+  --xss-touch: 44px; --xss-frame: 480px; --xss-radius: 8px; --xss-line: 1px;
+  --xss-body: 1rem; --xss-title: 1.44rem; --xss-small: .833rem; --xss-leading: 1.6;
+  --xss-weight: 600;
+  --xss-measure: 65ch; --xss-mono: ui-monospace, monospace;
+  color: var(--color-slate-100); font-size: var(--xss-body); line-height: var(--xss-leading);
+}
+.xss-lab * { box-sizing: border-box; }
+.xss-lab section { padding-block: var(--xss-s6); border-top: var(--xss-line) solid var(--color-slate-800); }
+.xss-lab h3 { font-size: var(--xss-title); font-weight: var(--xss-weight); }
+.xss-lab p { max-width: var(--xss-measure); margin-block: var(--xss-s4); overflow-wrap: anywhere; }
+.xss-lab .xss-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--xss-s4); }
+.xss-lab label { display: grid; grid-column: 1 / -1; gap: var(--xss-s2); min-width: 0; }
+.xss-lab :is(select, button) { min-height: var(--xss-touch); padding: var(--xss-s2) var(--xss-s4); border: var(--xss-line) solid var(--color-slate-700); border-radius: var(--xss-radius); background: var(--color-slate-950); color: var(--color-slate-100); font: inherit; max-width: 100%; }
+.xss-lab button { cursor: pointer; }
+.xss-lab .xss-primary { background: var(--color-sky-700); color: var(--color-white); }
+.xss-lab pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: var(--xss-s4); font: var(--xss-small)/var(--xss-leading) var(--xss-mono); background: var(--color-slate-950); font-variant-numeric: tabular-nums; }
+.xss-lab iframe { display: block; width: 100%; height: var(--xss-frame); border: var(--xss-line) solid var(--color-slate-700); border-radius: var(--xss-radius); }
+.xss-lab .xss-actions { display: flex; flex-wrap: wrap; gap: var(--xss-s2); }
+.xss-lab summary { padding-block: var(--xss-s4); cursor: pointer; border-top: var(--xss-line) solid var(--color-slate-800); overflow-wrap: anywhere; }
+.xss-lab :is(button, select, summary):focus-visible { outline: var(--xss-s1) solid var(--jwt-focus); outline-offset: var(--xss-s1); }
+@media (min-width: 768px) { .xss-lab .xss-controls { grid-template-columns: repeat(12, minmax(0, 1fr)); } .xss-lab label { grid-column: span 4; } }

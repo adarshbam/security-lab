@@ -21,7 +21,8 @@ export async function read(page: Page, path: string, options: { method?: string;
   }, { path, options });
 }
 export async function reset(page: Page) {
-  await page.goto(APP);
+  // Cookie tests select their lab explicitly; a new learner now starts with access control.
+  await page.goto(APP + '/?lab=cookie-storage');
   await expect(page.getByRole('button', { name: 'Next: Record Your Prediction' })).toBeVisible();
   await control(page, '/api/labs/cookie-storage/reset');
   await control(page, '/api/labs/samesite-csrf/reset');
@@ -44,7 +45,7 @@ export async function openLab2(page: Page, experiment = 'exp2-csrf-top-level-pos
 export async function configure(page: Page, mode: 'strict' | 'lax' | 'none') {
   const label = mode === 'strict' ? 'SameSite=Strict' : mode === 'lax' ? 'SameSite=Lax (Explicit)' : 'SameSite=None (Requires Secure)';
   await page.getByRole('button', { name: label, exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('SameSite=' + mode.toUpperCase());
+  await expect(page.getByRole('status').filter({ hasText: 'SameSite=' + mode.toUpperCase() })).toContainText('SameSite=' + mode.toUpperCase());
 }
 export async function observations(page: Page, experimentId?: string): Promise<ExperimentObservation[]> {
   return control(page, '/api/inspector/read' + (experimentId ? '?experimentId=' + experimentId : ''));

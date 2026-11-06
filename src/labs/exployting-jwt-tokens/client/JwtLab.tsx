@@ -3,6 +3,7 @@ import { KeyRound, FileKey2, Send, Copy, LogOut } from 'lucide-react';
 import { controlRequest } from '../../../client/api.js';
 import { demoUsers } from '../fixtures/accounts.js';
 import { inspectToken, editClaims, unsignedToken, signWithPublicKey } from './tokens.js';
+import { ActionExplanation } from '../../../client/components/ActionExplanation.js';
 
 const base = '/api/labs/exployting-jwt-tokens';
 const inputClass = 'w-full min-w-0 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200';
@@ -113,7 +114,13 @@ export function JwtLab({ activeExperimentId: id, onExperimentActionExecuted }: P
 
     {scenario !== 'storage' && <section className="panel space-y-4">
       <h3 className="font-semibold text-slate-100">1 · Sign in with a fictional account</h3>
-      <p className="text-xs text-slate-400">Published demo passwords are only for this lab. No real account or database is involved.</p>
+      <ActionExplanation title="Before issuing or revoking a JWT">
+        {scenario === 'size' ? <p>The account selector fills its published demo password. Run token-size comparison below uses those credentials to issue the two measurement tokens; there is no separate sign-in step for this experiment. Tokens remain in the measurement function’s memory, with no JWT cookie or localStorage write.</p> : <>
+          <p>The account selector fills its published demo password. Sign in posts the username, password, scenario and lifetime to /login. The server checks the fictional account and returns a signed JWT in JSON: RS256 for the confusion lesson, HS256 otherwise. Claims include the subject, role, issuer, audience, expiry, token ID and this lab’s reset epoch.</p>
+          <p>The page keeps the original and working JWT in React memory and fills the payload editor. This login sets no cookies and writes no JWT to localStorage. For the confusion lesson it also fetches /public-key to fill the PEM editor. Issuing a token does not send it to a dashboard or demonstrate an attack.</p>
+        </>}
+        <p>Logout posts to /logout, rotates this lab’s signing keys and epoch, clears its JWT cookies and CSRF-token map, and resets counters and the dummy preference. All previously issued JWTs fail this lab’s checks afterward. The page clears its token editors and results. This reset applies across JWT scenarios, including the deliberately vulnerable verifiers.</p>
+      </ActionExplanation>
       <div className="grid sm:grid-cols-3 gap-3">
         <label className="space-y-1 text-xs">Demo account<select aria-label="Demo account" className={inputClass} value={account} onChange={e => {
           setAccount(e.target.value); setPassword(demoUsers.find(u => u.username === e.target.value)!.password);
@@ -137,6 +144,10 @@ export function JwtLab({ activeExperimentId: id, onExperimentActionExecuted }: P
       <section className="panel space-y-4">
         <div className="flex flex-wrap justify-between items-center gap-3"><h3 className="font-semibold text-slate-100">2 · Inspect & edit the working token</h3>
           <span className="text-xs font-mono text-slate-400">{new TextEncoder().encode(token).length} bytes · decoded claims are untrusted</span></div>
+        <ActionExplanation title="Before editing the working credential">
+          <p>Typing in either editor changes only local page state. Decode reads the working token’s base64url JSON into the payload editor without verifying it. Apply payload replaces the encoded claims while keeping the existing signature, which will no longer authenticate modified claims. Restore reloads the original signed token; Copy writes the working string to your clipboard. None of these controls sends a verification request.</p>
+          {scenario === 'none' && <p>Prepare unsigned token sets alg to none, encodes your edited payload and removes the signature. This prepares the historical missing-key test locally; acceptance is determined only when you send it to a dashboard.</p>}
+        </ActionExplanation>
         <label className="block space-y-2 text-xs">Working JWT<textarea aria-label="Working JWT" rows={3} spellCheck={false} className={inputClass + ' font-mono break-all'} value={token} onChange={e => setToken(e.target.value)} placeholder="Issue a token to begin" /></label>
         <div className="grid lg:grid-cols-[1fr_2fr] gap-4">
           <div className="space-y-2"><h4 className="text-xs text-slate-400">Decoded header (unverified)</h4><pre className="result" data-testid="jwt-header">{decoded ? JSON.stringify(decoded.header, null, 2) : 'No readable token yet'}</pre>
@@ -156,7 +167,10 @@ export function JwtLab({ activeExperimentId: id, onExperimentActionExecuted }: P
           <div className="flex flex-wrap items-center justify-between gap-2"><h4 className="font-semibold text-sm">Public-key experiment</h4>
             <a className="text-xs text-sky-300 underline inline-flex gap-2" href={base + '/public-key'} download><FileKey2 className="w-4 h-4" />Download lab public key</a></div>
           <label className="block space-y-2 text-xs">Public PEM used as HMAC input<textarea aria-label="Public PEM used as HMAC input" rows={4} className={inputClass + ' font-mono text-xs'} value={pem} onChange={e => setPem(e.target.value)} /></label>
-          <p className="text-xs text-slate-400">The public key is intentionally public. This operation uses its exact text bytes in browser WebCrypto; no private key leaves the server.</p>
+          <ActionExplanation title="Before using the public PEM">
+            <p>Download makes GET /public-key and saves the server’s public RSA key. Sign HS256 with public PEM uses the exact text bytes in the editor as an HMAC secret in browser WebCrypto, signs the edited payload and replaces the working token. It sends no dashboard request and obtains no private key.</p>
+            <p>This tests whether a verifier confuses a public verification key with a symmetric signing secret. The historical 4.0.0 endpoint accepts the token’s algorithm without fixing it to RS256; the protected endpoint fixes RS256 and checks key type through the current library.</p>
+          </ActionExplanation>
           <button className="action secondary" disabled={!token || !pem || busy} onClick={() => work(async () => {
             setToken(await signWithPublicKey(token, editedPayload(), pem)); setMessage('Browser HMAC token prepared. Send it to both implementations.');
           })}>Sign HS256 with public PEM</button>
@@ -164,6 +178,11 @@ export function JwtLab({ activeExperimentId: id, onExperimentActionExecuted }: P
       </section>
       <section className="panel space-y-4">
         <h3 className="font-semibold text-slate-100">3 · Send the token & compare responses</h3>
+        <ActionExplanation title="Before sending to a dashboard">
+          <p>Each button makes GET to the selected scenario’s vulnerable or protected dashboard with view=admin or view=profile. The workbench explicitly sets Authorization: Bearer followed by the working JWT and uses credentials: omit, so cookies cannot authenticate these requests. The requested resource selector itself sends nothing.</p>
+          <p>{scenario === 'decode' ? 'The vulnerable endpoint decodes claims without checking a signature.' : scenario === 'confusion' ? 'The vulnerable endpoint uses jsonwebtoken 4.0.0 with the public PEM and no fixed algorithm, then validates the lab claims.' : 'The vulnerable endpoint uses jsonwebtoken 8.5.1 with a null verification key and no algorithm restriction. It models a missing key configuration: even an original signed token fails here, while an unsigned token can pass.'} All variants still require a known subject, allowed role, current epoch, token ID and unexpired expiry. The protected endpoint also verifies the signature with the scenario’s fixed algorithm and expected issuer and audience.</p>
+          <p>Token rejection returns 401. Accepted claims with a non-admin role return 403 for the admin view, proving authentication succeeded but authorization failed. Successful profile reads increment profileReads; the admin view also increments adminReads and returns the fictional directory. Editing a claim never changes an account’s stored role here. Compare the response’s authentication result, role and counters with the actual bearer header in Network.</p>
+        </ActionExplanation>
         <div className="flex flex-wrap items-end gap-3">
           <label className="space-y-1 text-xs">Requested resource<select aria-label="Requested resource" className={inputClass} value={view} onChange={e => setView(e.target.value)}>
             <option value="admin">Admin directory</option><option value="profile">My profile</option></select></label>
@@ -176,7 +195,11 @@ export function JwtLab({ activeExperimentId: id, onExperimentActionExecuted }: P
 
     {scenario === 'storage' && <section className="panel space-y-4">
       <h3 className="font-semibold text-slate-100">JWT is a format. Cookie flags control script access.</h3>
-      <p>Issue two independent JWT cookies for adarsh, inspect actual JavaScript access and request a profile using each cookie. This exercise assumes same-origin script execution already exists.</p>
+      <ActionExplanation title="Before issuing and inspecting JWT cookies">
+        <p>Issue JWT cookies posts to /cookies/login. It sets jwt_lab_readable and jwt_lab_httponly as independently signed, five-minute HS256 JWTs for adarsh, with distinct token IDs and CSRF tokens. Both are Secure, SameSite=Lax and Path=/; only the second is HttpOnly. No credential is returned in JSON or written to localStorage.</p>
+        <p>Inspect JWT cookies reads document.cookie, then automates GET /cookies/profile/readable and /cookies/profile/httponly. The browser attaches cookies without a bearer header. Each endpoint verifies only its named JWT cookie, including signature, algorithm, issuer, cookie audience, epoch and expiry. A valid cookie returns 200; invalid or expired credentials return 401. The read does not change the dummy preference. Application can show both stored cookies while JavaScript sees only the readable one.</p>
+        <p>Run fixed same-origin JWT action assumes script already executes on the app origin. It fetches /cookies/csrf-token with the HttpOnly JWT, then posts to /cookies/preference with X-CSRF-Token. The server checks the JWT, exact app Origin and matching token, then sets the dummy preference to purple. It does not read or steal the HttpOnly JWT. Inspect both helper and mutation requests: HttpOnly does not prevent same-origin script from using the session.</p>
+      </ActionExplanation>
       <div className="flex flex-wrap gap-2">
         <button className="action" disabled={busy} onClick={() => work(async () => {
           await controlRequest(base + '/cookies/login', { experimentId: id }); setCookiesReady(true); setStorageEvidence(undefined); setResults([]);
@@ -190,7 +213,11 @@ export function JwtLab({ activeExperimentId: id, onExperimentActionExecuted }: P
 
     {scenario === 'size' && <section className="panel space-y-4">
       <h3 className="font-semibold text-slate-100">2 · Measure actual authenticated requests</h3>
-      <p>Compare a small signed token with the same identity plus a fictional profile-notes claim. Each request goes through the protected verifier. Authentication performs no profile-data lookup.</p>
+      <ActionExplanation title="Before measuring token size">
+        <p>Run token-size comparison automates two POST /login requests using the selected demo credentials: one without padding and one with the chosen number of ASCII characters in profileNotes. For each token it makes the selected number of GET /size/verify requests with an explicit bearer header and cookies omitted. The selectors only change the next run’s inputs.</p>
+        <p>The server verifies HS256, issuer, audience and lab claims, then measures the UTF-8 byte length of the actual Authorization header value, including the Bearer prefix. The table sums those value bytes over the requests. It excludes header names, other headers, compression, TLS and response traffic. Verification times are noisy samples, not a performance benchmark.</p>
+        <p>This endpoint does not call the profile-data reader, so profileReads stays unchanged across these requests. That is a property of this implementation, not proof that JWT applications never access server state: the verifier still checks this lab’s in-memory epoch and known subjects. Compare each Network request with the raw measurements.</p>
+      </ActionExplanation>
       <div className="grid sm:grid-cols-2 gap-4">
         <label className="text-xs space-y-1">Extra ASCII claim bytes<select aria-label="Extra claim bytes" className={inputClass} value={padding} onChange={e => setPadding(Number(e.target.value))}>
           {[256, 1024, 2048, 4096].map(n => <option key={n} value={n}>{n}</option>)}</select></label>

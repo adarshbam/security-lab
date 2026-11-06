@@ -88,6 +88,11 @@ export function inspectorMiddleware(req: Request, res: Response, next: NextFunct
         stateBefore,
         stateAfter,
         status: res.statusCode,
+        requestBody: requestPath.startsWith('/api/labs/privilege-escalation/') && req.method === 'PATCH' &&
+          req.body && typeof req.body === 'object' && !Array.isArray(req.body)
+          ? Object.fromEntries(Object.entries(req.body).slice(0, 12).map(([key, value]) => [key,
+              ['displayName', 'role', 'id', 'ownerId'].includes(key) && typeof value === 'string'
+                ? value.slice(0, 100) : '[OMITTED]'])) : undefined,
       };
 
       inspectorStore.record(observation);

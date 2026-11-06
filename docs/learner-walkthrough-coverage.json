@@ -1,0 +1,254 @@
+[
+  {
+    "lab": "broken-access-control",
+    "experiment": "access-files",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "broken-access-control",
+    "experiment": "access-delete-file",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "broken-access-control",
+    "experiment": "access-delete-folder",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "privilege-escalation",
+    "experiment": "privilege-role",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "privilege-escalation",
+    "experiment": "privilege-delete",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "cookie-storage",
+    "experiment": "exp1-storage-types",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "cookie-storage",
+    "experiment": "exp2-auth-mechanisms",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 5,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "cookie-storage",
+    "experiment": "exp3-secure-transport",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "cookie-storage",
+    "experiment": "exp4-scope-boundaries",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "cookie-storage",
+    "experiment": "exp5-expiration-lifecycles",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "samesite-csrf",
+    "experiment": "exp1-samesite-modes",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "samesite-csrf",
+    "experiment": "exp2-csrf-top-level-post",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "samesite-csrf",
+    "experiment": "exp3-csrf-top-level-get",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "samesite-csrf",
+    "experiment": "exp4-csrf-tokens",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "samesite-csrf",
+    "experiment": "exp5-origin-validation",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "samesite-csrf",
+    "experiment": "exp6-sibling-vs-attacker",
+    "predictions": 4,
+    "conceptAnswers": 3,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "injection-attacks",
+    "experiment": "injection-sql",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "injection-attacks",
+    "experiment": "injection-nosql",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "injection-attacks",
+    "experiment": "injection-coercion",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "xss-csp",
+    "experiment": "xss-reflected",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 2,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "xss-csp",
+    "experiment": "xss-stored",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 2,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "xss-csp",
+    "experiment": "xss-dom",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 2,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "xss-csp",
+    "experiment": "xss-csp",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 2,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "exployting-jwt-tokens",
+    "experiment": "jwt-decode",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "exployting-jwt-tokens",
+    "experiment": "jwt-confusion",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "exployting-jwt-tokens",
+    "experiment": "jwt-none",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "exployting-jwt-tokens",
+    "experiment": "jwt-storage",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  },
+  {
+    "lab": "exployting-jwt-tokens",
+    "experiment": "jwt-size",
+    "predictions": 3,
+    "conceptAnswers": 2,
+    "steps": 3,
+    "stages": 5,
+    "reviewPersisted": true
+  }
+]

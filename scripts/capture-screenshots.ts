@@ -16,6 +16,7 @@ async function capture() {
     await page.goto(APP);
     await expect(page.getByRole('button', { name: 'Next: Record Your Prediction' })).toBeVisible();
     await page.screenshot({ path: 'docs/screenshots/dashboard.png', fullPage: true });
+    await page.goto(APP + '/?lab=cookie-storage');
     await unlock(page, 'exp2-auth-mechanisms'); await login(page);
     await page.getByRole('button', { name: 'Execute Injected Script Harness' }).click();
     await expect(page.getByTestId('harness-output')).toContainText('Status: 200');
@@ -92,6 +93,33 @@ async function capture() {
     await page.getByRole('button', { name: 'Compare Outcome & Hypotheses' }).click();
     await page.getByRole('button', { name: 'Proceed to In-Depth Learning & References' }).click();
     await expect(page.getByRole('heading', { name: 'My beginner takeaway' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Broken Access Control', exact: true }).click();
+    await unlock(page, 'access-files');
+    await page.getByRole('button', { name: 'Sign in to selected world' }).click();
+    await page.getByRole('button', { name: 'Send request' }).click();
+    await expect(page.getByTestId('access-response')).toContainText('Sam’s fictional private launch plan');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: 'docs/screenshots/access-workbench.png', fullPage: true });
+    await page.setViewportSize({ width: 375, height: 844 });
+    const accessWidth = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, viewport: innerWidth }));
+    if (accessWidth.scroll > accessWidth.viewport) throw new Error('Access workbench overflows: ' + JSON.stringify(accessWidth));
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: 'docs/screenshots/access-mobile.png', fullPage: true });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.getByRole('button', { name: 'Privilege Escalation', exact: true }).click();
+    await unlock(page, 'privilege-role');
+    await page.getByRole('button', { name: 'Sign in to selected world' }).click();
+    await page.getByRole('button', { name: 'Send request' }).click();
+    await expect(page.getByTestId('privilege-response')).toContainText('"role": "admin"');
+    await page.getByRole('button', { name: 'Refresh server identity' }).click();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: 'docs/screenshots/privilege-workbench.png', fullPage: true });
+    await page.setViewportSize({ width: 375, height: 844 });
+    const privilegeWidth = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, viewport: innerWidth }));
+    if (privilegeWidth.scroll > privilegeWidth.viewport) throw new Error('Privilege workbench overflows: ' + JSON.stringify(privilegeWidth));
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: 'docs/screenshots/privilege-mobile.png', fullPage: true });
 
     const mobile = await context.newPage(); await mobile.setViewportSize({ width: 390, height: 844 });
     await mobile.goto(APP);

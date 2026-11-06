@@ -31,7 +31,8 @@ export const CodeSnippet: React.FC<CodeSnippetProps> = ({ snippets }) => {
               <span className="text-[10px] uppercase font-mono text-slate-500">{snip.language}</span>
               <button
                 onClick={() => handleCopy(snip.code, idx)}
-                className="text-slate-400 hover:text-slate-200 transition-colors p-1"
+                className="source-copy inline-flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors p-1"
+                aria-label={`Copy ${snip.title} source`}
                 title="Copy snippet"
               >
                 {copiedIdx === idx ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}

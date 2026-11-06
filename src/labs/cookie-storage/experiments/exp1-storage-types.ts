@@ -36,7 +36,12 @@ export const exp1StorageTypes: ExperimentDefinition = {
 The \`HttpOnly\` flag creates an architectural barrier that prevents client-side JavaScript from reading or exfiltrating the credential string.
 
 - **Mitigation value**: If an attacker finds a Cross-Site Scripting (XSS) vulnerability, they cannot execute \`document.cookie\` or \`localStorage.getItem()\` to exfiltrate the \`session_httponly\` token to an external server.
-- **Limitation**: While HttpOnly prevents *direct token exfiltration*, the browser will still attach the cookie to ambient requests made by the attacker's script (as investigated in Experiment 2!).
+- **Limitation**: While HttpOnly prevents *direct token exfiltration*, the browser can still attach the cookie to eligible requests made by an attacker's script. Investigate this in [Ambient Auth & Injected Script Harness](#experiment-exp2-auth-mechanisms).
+
+### Threat model: who controls the browser?
+HttpOnly is a cookie attribute. It hides the credential from page JavaScript, including a script injected through XSS. It does not hide the cookie from a person controlling the browser or its Developer Tools. A running same-origin script may still make authenticated requests.
+
+An opaque session ID keeps user data on the server and supports server-side revocation. A stolen valid session ID can still impersonate its session until expiry or revocation. Its authority depends on the server’s permission checks; opacity alone does not restrict it. JWT format, cookie storage, and authorization are separate design decisions.
 
 ### References
 - [MDN: HttpOnly Cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#httponly)

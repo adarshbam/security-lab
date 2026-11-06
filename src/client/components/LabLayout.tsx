@@ -1,15 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLearnerProgress } from '../hooks/useLearnerProgress.js';
 import { useInspector } from '../hooks/useInspector.js';
 import { StepUnderstand } from './StepUnderstand.js';
 import { StepPredict } from './StepPredict.js';
 import { StepExperiment } from './StepExperiment.js';
 import { StepCompare } from './StepCompare.js';
-import { StepLearn } from './StepLearn.js';
+import { LearningPractice } from './LearningPractice.js';
 import { RequestInspector } from './RequestInspector.js';
 import { Check, Lock } from 'lucide-react';
 import type { LabManifest, ExperimentDefinition } from '../../shared/contracts/lab.js';
 import type { ExperimentStep } from '../../shared/contracts/progress.js';
+
+// The Markdown renderer is needed only when the learner opens the explanation.
+const loadStepLearn = () => import('./StepLearn.js');
+const StepLearn = React.lazy(() => loadStepLearn().then(module => ({ default: module.StepLearn })));
 
 interface LabLayoutProps {
   manifest: LabManifest;
@@ -35,12 +39,16 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
   children,
 }) => {
   const currentExperiment = experiments[activeExperimentId] || Object.values(experiments)[0];
-  const { progress, setStep, setPrediction, recordAttempt } = useLearnerProgress(
+  const { progress, update, setStep, setPrediction, setInvestigationNotes, recordAttempt } = useLearnerProgress(
     manifest.id,
     currentExperiment.id
   );
+  const [openedExperimentId, setOpenedExperimentId] = useState<string | null>(null);
+  useEffect(() => {
+    if (progress.currentStep === 'experiment') setOpenedExperimentId(currentExperiment.id);
+  }, [progress.currentStep, currentExperiment.id]);
 
-  const { observations, error: inspectorError, isLoading: isInspectorLoading, refresh: refreshInspector, clearLogs } = useInspector(
+  const { observations, error: inspectorError, isLoading: isInspectorLoading, refresh: refreshInspector, clearLogs, live, setLive } = useInspector(
     currentExperiment.id
   );
 
@@ -57,13 +65,7 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
     refreshInspector();
   };
 
-  const isStepEnabled = (step: ExperimentStep): boolean => {
-    if (step === 'understand' || step === 'predict') return true;
-    if (step === 'experiment') return Boolean(progress.selectedPredictionId);
-    if (step === 'compare') return progress.attempted;
-    if (step === 'learn') return progress.unlockedLearn;
-    return false;
-  };
+  const isStepEnabled = (): boolean => true;
 
   return (
     <div className="space-y-6">
@@ -74,7 +76,7 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
             <span className="text-xs font-semibold uppercase tracking-wider text-sky-400">
               Interactive Lab
             </span>
-            <h2 className="text-xl font-bold text-slate-100 mt-0.5">{manifest.title}</h2>
+            <h2 id="active-lab-heading" tabIndex={-1} className="text-xl font-bold text-slate-100 mt-0.5">{manifest.title}</h2>
             <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
               {manifest.description}
             </p>
@@ -87,7 +89,7 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
               aria-label="Select Experiment"
               value={activeExperimentId}
               onChange={(e) => onSelectExperiment(e.target.value)}
-              className="max-w-full min-w-0 bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              className="max-w-full min-w-0 bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 font-medium"
             >
               {manifest.experiments.map((exp) => (
                 <option key={exp.id} value={exp.id}>
@@ -103,14 +105,16 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
           <nav className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {STEP_LABELS.map(({ step, title, num }) => {
               const isActive = progress.currentStep === step;
-              const enabled = isStepEnabled(step);
+              const enabled = isStepEnabled();
 
               return (
                 <button
                   key={step}
-                  onClick={() => enabled && setStep(step)}
+                  onPointerEnter={() => { if (step === 'learn') void loadStepLearn(); }}
+                  onFocus={() => { if (step === 'learn') void loadStepLearn(); }}
+                  onClick={() => { setStep(step); if (step === 'learn') update({ explanationViewedAt: Date.now() }); }}
                   disabled={!enabled}
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-left ${
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors text-left ${
                     isActive
                       ? 'bg-sky-600 text-white shadow-sm ring-1 ring-sky-400'
                       : enabled
@@ -119,6 +123,7 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
                   }`}
                 >
                   <span
+                    aria-hidden="true"
                     className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
                       isActive
                         ? 'bg-white text-sky-700'
@@ -143,6 +148,7 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
         </div>
       </div>
 
+      <p className="text-sm text-slate-300">Choose a guided step above, or <button className="underline" onClick={() => setStep('experiment')}>Explore freely</button>. Explanations are always available. An attempt is not a claim of mastery.</p>
       {/* Step Content Area */}
       <div>
         {progress.currentStep === 'understand' && (
@@ -161,14 +167,18 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
           />
         )}
 
-        {progress.selectedPredictionId && (
+        {(
           <div hidden={progress.currentStep !== 'experiment'}>
             <StepExperiment
+              key={currentExperiment.id}
               experiment={currentExperiment}
               attempted={progress.attempted}
+              notes={progress.investigationNotes || ''}
+              onNotesChange={setInvestigationNotes}
               onNext={() => setStep('compare')}
             >
-              {children({ onExperimentActionExecuted: handleExperimentActionExecuted })}
+              {(progress.currentStep === 'experiment' || openedExperimentId === currentExperiment.id) &&
+                children({ onExperimentActionExecuted: handleExperimentActionExecuted })}
             </StepExperiment>
           </div>
         )}
@@ -179,20 +189,28 @@ export const LabLayout: React.FC<LabLayoutProps> = ({
             selectedPredictionId={progress.selectedPredictionId}
             observations={observations}
             evidence={progress.evidence}
-            onNext={() => setStep('learn')}
+            investigationNotes={progress.investigationNotes}
+            onRetry={() => setStep('experiment')}
+            onNext={() => { update({ explanationViewedAt: Date.now() }); setStep('learn'); }}
           />
         )}
 
         {progress.currentStep === 'learn' && (
-          <StepLearn
-            experiment={currentExperiment}
-            references={manifest.references}
-            unlocked={progress.unlockedLearn}
-          />
+          <React.Suspense fallback={<p role="status">Loading explanation…</p>}>
+            <StepLearn
+              experiment={currentExperiment}
+              references={manifest.references}
+              unlocked={true}
+              experiments={experiments}
+              onSelectExperiment={onSelectExperiment}
+            />
+          </React.Suspense>
         )}
       </div>
 
+      <LearningPractice key={currentExperiment.id} experiment={currentExperiment} progress={progress} update={update} />
       {/* Request Inspector for the active experiment */}
+      <label className="block"><input type="checkbox" checked={live} onChange={event => setLive(event.target.checked)} /> Live inspector updates (off by default)</label>
       <RequestInspector
         observations={observations}
         isLoading={isInspectorLoading}

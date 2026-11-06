@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import type { Server } from 'node:net';
 import { createApp } from './app.js';
 import { createHttpProbeApp } from './hosts/http-probe.js';
+import { createIsolatedXssApp } from '../labs/xss-csp/server/isolated.js';
 import { hasCertificates, certFile, keyFile } from '../../scripts/generate-cert.js';
 
 async function listen(server: Server, port: number) {
@@ -24,16 +25,18 @@ export async function start() {
   const { app, vite } = await createApp(server);
   server.on('request', app);
   const probe = http.createServer(createHttpProbeApp());
-  try { await listen(server, 8443); await listen(probe, 8080); }
+  const xss = https.createServer({ key: fs.readFileSync(keyFile), cert: fs.readFileSync(certFile) }, createIsolatedXssApp());
+  try { await listen(server, 8443); await listen(probe, 8080); await listen(xss, 8444); }
   catch (error) {
-    await vite?.close(); server.close(); probe.close();
+    await vite?.close(); server.close(); probe.close(); xss.close();
     throw error;
   }
   const close = async () => {
     await vite?.close();
-    server.closeAllConnections(); probe.closeAllConnections();
+    server.closeAllConnections(); probe.closeAllConnections(); xss.closeAllConnections();
     await Promise.all([new Promise<void>(resolve => server.close(() => resolve())),
-      new Promise<void>(resolve => probe.close(() => resolve()))]);
+      new Promise<void>(resolve => probe.close(() => resolve())),
+      new Promise<void>(resolve => xss.close(() => resolve()))]);
   };
   process.once('SIGINT', () => { close().then(() => process.exit(0)); });
   process.once('SIGTERM', () => { close().then(() => process.exit(0)); });

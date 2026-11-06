@@ -100,5 +100,5 @@ samesiteCsrfRouter.post('/reset-preferences', adminGuard, (_req, res) => {
 samesiteCsrfRouter.post('/reset', adminGuard, (_req, res) => {
   labState.reset();
   res.clearCookie('session_csrf', { ...cookieOptions });
-  res.json({ success: true, message: 'Lab 2 reset and credentials invalidated; other labs are unchanged.' });
+  res.json({ success: true, message: 'CSRF lab reset and credentials invalidated; other labs are unchanged.' });
 });

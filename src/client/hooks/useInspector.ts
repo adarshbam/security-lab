@@ -5,6 +5,7 @@ import type { ExperimentObservation } from '../../shared/contracts/inspector.js'
 export function useInspector(experimentId?: string) {
   const [observations, setObservations] = useState<ExperimentObservation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [live, setLive] = useState(false);
   const [error, setError] = useState('');
   const query = experimentId ? '?experimentId=' + encodeURIComponent(experimentId) : '';
   const refresh = useCallback(async () => {
@@ -16,13 +17,13 @@ export function useInspector(experimentId?: string) {
   useEffect(() => {
     setObservations([]);
     refresh();
-    const timer = setInterval(refresh, 1500);
+    const timer = live ? setInterval(() => { if (!document.hidden) void refresh(); }, 5000) : undefined;
     return () => clearInterval(timer);
-  }, [refresh]);
+  }, [refresh, live]);
   const clearLogs = async () => {
     try { await controlRequest('/api/inspector/clear' + query); setObservations([]); setError(''); }
     catch (e) { setError(String(e)); }
   };
   return { observations: observations.filter(o => !experimentId || o.experimentId === experimentId),
-    isLoading, error, refresh, clearLogs };
+    isLoading, error, refresh, clearLogs, live, setLive };
 }
