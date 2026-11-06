@@ -1,5 +1,7 @@
 # Lab 1 — HttpOnly Cookies vs localStorage
 
+[All labs](../../../../README.md) · [Trusted setup](../../../../docs/setup.md) · [Evidence guide](../../../../docs/LEARNING-GUIDE.md)
+
 Use the application at `https://app.security-lab.test:8443`. All identities and credentials are fictional. Reset Experiment affects this lab; Restart Learning Progress affects the learning wizard.
 
 ## Working through the lab

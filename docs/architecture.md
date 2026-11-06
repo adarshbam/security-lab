@@ -1,5 +1,23 @@
 # Architecture and adding a lab
 
+[Overview](../README.md) · [Learning guide](LEARNING-GUIDE.md) · [Setup](setup.md)
+
+## System map
+
+```mermaid
+flowchart TD
+    App[Legitimate browser page] --> HTTPS[Loopback HTTPS server]
+    Sibling[Sibling-origin page] --> HTTPS
+    Attacker[Cross-site page] --> HTTPS
+    HTTPS --> Guard[Host and control guards]
+    Guard --> Modules[Module-owned Express routes]
+    Modules --> State[Lab-local dummy state]
+    Modules --> Inspector[Redacted request inspector]
+    App --> Progress[Local learner progress]
+```
+
+The sibling and attacker are browser origins mapped to the same loopback listener, not remote attack services. A separate loopback HTTP listener serves the read-only transport probe. Public source does not make the vulnerable runtime safe to host.
+
 ## Runtime boundaries
 
 One npm package contains a React/Vite client and an Express server. Express owns HTTPS on 127.0.0.1:8443; Vite runs in middleware mode with HMR on the same HTTPS listener. Built mode serves the frontend from dist while retaining the same lab APIs. A separate HTTP server on 127.0.0.1:8080 exposes only read-only diagnostics.

@@ -1,5 +1,7 @@
 # Lab 3 — JWT Tokens: Decode, Verify & Exploit
 
+[All labs](../../../../README.md) · [Trusted setup](../../../../docs/setup.md) · [Evidence guide](../../../../docs/LEARNING-GUIDE.md)
+
 Run the shared [trusted HTTPS setup](../../../../docs/setup.md), then `npm run dev`. Open `https://app.security-lab.test:8443` and select the JWT lab. Existing installations need `npm install` after updating the repository. No extra server, database, host mapping or account is required.
 
 This local module uses fictional accounts and real signed tokens. The account picker supplies published demo passwords: `adarsh / pass123` is a user and `rahul / admin@123` is an admin. Those credentials are teaching fixtures, not password-storage guidance. Token lifetime is adjustable from 1 to 300 seconds.

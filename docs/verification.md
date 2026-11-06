@@ -1,5 +1,15 @@
 # Verification record
 
+## Reading this record
+
+[Overview](../README.md) · [Setup](setup.md) · [Architecture](architecture.md)
+
+Commands and historical results are separate. `npm run check` is the full local entry point; `npm test` runs server/browser checks; `npm run test:e2e -- --headed` opens the browser journey. `npm run screenshots` captures real learner flows. Stop a running lab before test/screenshot commands.
+
+The 6 November 2026 documentation review did not rerun product suites. The last inspected hosted run for the JWT source revision is [41288012004](https://github.com/adarshbam/security-lab/actions/runs/41288012004): Ubuntu and macOS completed checks successfully; Windows was cancelled during trust/hosts setup before its tests. This is not an all-platform green result or a statement about later runs.
+
+## Dated local evidence
+
 Results below apply to the code and dependency set described in each dated entry. The current JWT extension deliberately includes vulnerable historical libraries; the earlier clean dependency audits describe only the cookie/CSRF baseline.
 
 Recorded on **13 October 2026**, using Windows x64, Node **24.11.1**, Playwright **1.64.0** and its pinned Chromium **156.0.8078.4**.

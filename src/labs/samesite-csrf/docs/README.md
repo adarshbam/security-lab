@@ -1,5 +1,7 @@
 # Lab 2 — SameSite & CSRF
 
+[All labs](../../../../README.md) · [Trusted setup](../../../../docs/setup.md) · [Evidence guide](../../../../docs/LEARNING-GUIDE.md)
+
 The legitimate app is `https://app.security-lab.test:8443`. Its sibling is `https://sibling.security-lab.test:8443`; the cross-site attacker is `https://attacker.csrf-lab.test:8443`.
 
 Select an experiment, record a prediction and configure a cookie. Open the appropriate source console from the learner page. Submit the source page's forms, links, fetch or embedded probe. Result tabs preserve your learner workspace; return to inspect original request headers and profile state.

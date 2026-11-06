@@ -1,5 +1,7 @@
 # Trusted local setup
 
+[Overview](../README.md) · [Learning guide](LEARNING-GUIDE.md) · [Architecture](architecture.md)
+
 Use Node 24 and run `npm install` in the repository. The one-time system steps below are explicit because local HTTPS needs a trusted development CA and cross-site experiments need separate names.
 
 ## Windows
