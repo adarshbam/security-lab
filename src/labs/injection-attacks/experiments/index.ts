@@ -86,4 +86,3 @@ export const injectionExperiments: Record<string, ExperimentDefinition> = Object
     defenderReplay: 'Select Protected and send the same local input, then use the legitimate example as a positive control. The selector chooses an existing executable implementation. It does not edit source. Compare request types, query structure, response and GET /me. All identities and credentials are fictional.',
   }];
 }));
-

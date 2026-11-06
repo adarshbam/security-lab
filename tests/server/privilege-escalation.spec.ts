@@ -30,4 +30,3 @@ test('current role is persisted, deletion revokes sessions, reset isolates world
   assert.equal(vulnerable.actor(alexToken), undefined);
   assert.equal(vulnerable.user('sam')?.id, 'sam');
 });
-

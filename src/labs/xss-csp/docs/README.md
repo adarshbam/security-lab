@@ -78,4 +78,3 @@ The audit captures eight screenshots, runs axe on the workbench and separately o
 The existing project components and warm-neutral tokens were reused; no 21st component dependency was installed. The 21st catalogue search supplied no useful replacement for the existing workbench primitives. The local `21st review` command was unavailable in this environment.
 
 Verified on 2 November 2026: type checking and scoped ESLint passed; Vite built successfully; 22 server tests and five XSS browser tests passed. All eight width/theme checks had no horizontal overflow or workbench axe violations; the independently served current lesson document had no axe violations, and no uncaught page errors were recorded. The last mobile Lighthouse run scored Performance **98** and Accessibility **100**, with LCP approximately **1.05 s** and CLS **0**. Scores varied across local runs and are not field performance guarantees. Field INP and non-Chromium browser behavior remain unmeasured.
-
